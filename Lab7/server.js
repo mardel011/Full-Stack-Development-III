@@ -9,7 +9,7 @@ const http = require("http"),
 
 const connectionString = "mongodb://mardel011:Heyhey000@cluster0-shard-00-00-yuz7l.mongodb.net:27017,cluster0-shard-00-01-yuz7l.mongodb.net:27017,cluster0-shard-00-02-yuz7l.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority";
 mongoose
-  .connect(connectionString, { useNewURLParser: true})
+  .connect(connectionString)
   .then( () => { console.log("Mongoose connected successfully "); },
   error => { console.log("Mongoose could not connected to database: " + error); }
  );
@@ -61,7 +61,21 @@ ioServer.on("connection", function(socket) {
     console.log("Disconnected...");
   });
 
-  
+  socket.on("challenge", () => {
+    console.log("server - get-restarants called");
+      Restaurant.find((error,documents)=>{
+      if(error) console.log(`Error occured on Restaurant.find(): ${error}`);
+      else{
+          documents.map(x=>x.city="Queens");
+          documents.map(x=>x.cuisine="Delicatessen");
+                  
+        console.log(`Restaurant.find() returned documents: ${documents}`);
+        const data=JSON.stringify(documents);
+        socket.emit("challenge",data);
+      }
+    });
+});
+
   socket.on("get-restaurants", () => {
     console.log("server - get-restaurants called");
 
@@ -85,14 +99,20 @@ ioServer.on("connection", function(socket) {
           socket.emit("orders-data",data); 
         }
       });
+
+      const addOrder = new Order({
+        orderId: "April 3, 2020",
+        item: "vegan hot dog",
+        customer_name: "Mar"
+        });
       socket.on("add-orders", () => {
         console.log("server - add-orders called");
     
-        addOrder.find((error, documents) => {
-          if (error) console.log(`Error occured on addOrder.find(): ${error}`);
+        addOrder.save((error, addOrder) => {
+          if (error) console.log(`Error occured on addOrder.save(): ${error}`);
           else {
-            console.log(`addOrder.find() returned documents: ${documents}`);
-            const data = documents.map(x => x => x.name);
+            console.log(`addOrder.save() added order: ${addOrder}`);
+            const data = JSON.stringify(addOrder);
             socket.emit("add-orders-data",data); 
            }
         });

@@ -42,6 +42,7 @@
       const getRestaurants = () => socket.emit('get-restaurants');
       const getOrders = () => socket.emit('get-orders');
       const createOrder = () => socket.emit('add-orders');
+      const challenge = () => socket.emit('challenge');
     </script>
     
     <h1>Socket.io Lab</h1>
@@ -51,5 +52,6 @@
     <button id="getRestaurants" onClick='getRestaurants()'/>Get Restaurants</button>
     <button id="getOrders" onClick='getOrders()'/>Get Orders</button>
     <button id="createOrder" onClick='createOrder()'/>Place Order</button>
+    <button id="challenge" onClick='challenge()'/>Challenge</button>
   </body>
 </html>
